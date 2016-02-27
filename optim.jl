@@ -1,6 +1,6 @@
 using DataFrames
 using JuMP
-Using Clp
+using Clp
 
 rrt = readtable("dat/rrt.csv")
 
@@ -42,17 +42,15 @@ m = Model()
 @addConstraint(m, suff_spanish[month=1:tot_month],
 	AffExpr(month_assgn[:, month], float64(vector(rrt["spanish"])), 0.0) >= 4.0)
 # At least 2 French Speakers every month
-@addConstraint(m, suff_french[month=1:tot_month],
-	sum{month_assgn[employ, month] * rrt[employ, "french"], employ=1:tot_employ} >= 2)
-# At least 1 logistics employee every month
-@addConstraint(m, suff_logistics[month=1:tot_month],
-	sum{month_assgn[employ, month] * rrt[employ, "logistics"], employ=1:tot_employ} >= 1)
-# At least 4 medical officers every month
-@addConstraint(m, suff_medofficer[month=1:tot_month],
-	sum{month_assgn[employ, month] * rrt[employ, "medofficer"], employ=1:tot_employ} >= 4)
+# @addConstraint(m, suff_french[month=1:tot_month],
+# 	sum{month_assgn[employ, month] * rrt[employ, "french"], employ=1:tot_employ} >= 2)
+# # At least 1 logistics employee every month
+# @addConstraint(m, suff_logistics[month=1:tot_month],
+# 	sum{month_assgn[employ, month] * rrt[employ, "logistics"], employ=1:tot_employ} >= 1)
+# # At least 4 medical officers every month
+# @addConstraint(m, suff_medofficer[month=1:tot_month],
+# 	sum{month_assgn[employ, month] * rrt[employ, "medofficer"], employ=1:tot_employ} >= 4)
 
-
-# addConstraint(m, y + z == 4)  # Other options: <= and >=
-@addConstraint(m, no_pref_confl[employ=1:tot_employ,month=1:tot_month],
-			   month_assgn[employ, month] + month_pref[employ, month] <= 1)
-setObjective(m, :Min, sum(month_assgn)) # or :Min
+#this is a vacuous constraint at the moment since we are
+#constraining the total number of team assignments direclty
+setObjective(m, :Min, sum(month_assgn))
