@@ -93,6 +93,9 @@ status = solve(m)
 
 #This should really dump to a file, but I don't know how to make Julia do that.
 if status == :Optimal
+	## How to write to file. 
+	writedlm("/tmp/test.txt", month_assgn)
+	
 	println("=======================================")
 	println(getValue(month_assgn))
 	println("=======================================")
