@@ -90,12 +90,29 @@ setObjective(m, :Min,
 			 sum(spanish_slack) * priority_dict["spanish"] +
 			 sum(french_slack) * priority_dict["french"] +
 			 sum(logistics_slack) * priority_dict["logistics"] +
-			 sum(medofficer_slack) * priority_dict["medofficer"] +
-			 sum(pha_slack) * priority_dict["pha"] +
-			 sum(ICSpart_slack) * priority_dict["ICSpart"] +
-			 sum(ICSlead_slack) * priority_dict["ICSlead"] +
-			 sum(Response_primary_slack) * priority_dict["Response_primary"] +
-			 sum(Response_leader_slack) * priority_dict["Response_leader"]
+			 sum(medofficer_slack[month]) * priority_dict["medofficer"] +
+			 sum(pha_slack[month]) * priority_dict["pha"] +
+			 sum(ICSpart_slack[month]) * priority_dict["ICSpart"] +
+			 sum(ICSlead_slack[month]) * priority_dict["ICSlead"] +
+			 sum(Response_primary_slack[month]) * priority_dict["Response_primary"] +
+			 sum(Response_leader_slack[month]) * priority_dict["Response_leader"]
 			)
 
 status = solve(m)
+
+if status == :Optimal
+	println("=======================================")
+	getValue(month_assgn)
+	println("=======================================")
+	getValue(preference_slack)
+	getValue(spanish_slack)
+	getValue(french_slack)
+	getValue(logistics_slack)
+	getValue(medofficer_slack)
+	getValue(pha_slack)
+	getValue(ICSpart_slack)
+	getValue(ICSlead_slack)
+	getValue(Response_primary_slack)
+	getValue(Response_leader_slack)
+end
+
