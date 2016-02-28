@@ -4,8 +4,8 @@ using Clp
 
 rrt = readtable("dat/rrt.csv")
 
-month_names = vec([string('m', year, '_', month) for year=2016:2017,month=1:12])
-month_pref = rrt[month_names]
+#This is a hack that I'm using in order to index the month_prefs the same
+#as the month_assgn.
 month_pref = rrt[vec([string('m', year, '_', month) for year=2016:2017,month=1:12])]
 
 priority_dict = ["spanish" => 1.0,
@@ -22,6 +22,10 @@ tot_employ,total_vars = size(rrt)
 tot_month = 24
 
 m = Model()
+
+#Defining the month assignment variables and the
+# "slack" variables which capture the flattening
+# out of the penalty once we hit the minimum required.
 @defVar(m, month_assgn[1:tot_employ, 1:tot_month], Bin)
 @defVar(m, spanish_slack[1:tot_month] >= 0)
 @defVar(m, french_slack[1:tot_month] >= 0)
@@ -32,10 +36,8 @@ m = Model()
 @defVar(m, ICSlead_slack[1:tot_month] >= 0)
 @defVar(m, Response_primary_slack[1:tot_month] >= 0)
 @defVar(m, Response_leader_slack[1:tot_month] >= 0)
-# @defExpr(m, expr[i=1:3], i*sum{x[j], j=1:3})
-# @defExpr(m, tot_spanish[month=1:tot_month],
-# 	sum{month_assgn[employ, month] * rrt[employ, "spanish"], employ=1:tot_employ})
-# Employees serve according to preference
+
+# Employees serve according to preference.
 # We could make this a soft constraint, but that seems evil.
 @addConstraint(m, no_pref_confl[employ=1:tot_employ,month=1:tot_month],
 			   month_assgn[employ, month] + month_pref[employ, month] <= 1)
@@ -89,21 +91,8 @@ setObjective(m, :Min,
 
 status = solve(m)
 
+#This should really dump to a file, but I don't know how to make Julia do that.
 if status == :Optimal
-	# outfile = open("dat/optimization_output.txt", "w+")
-	# write(outfile, "=======================================")
-	# write(outfile, getValue(month_assgn))
-	# write(outfile, "=======================================")
-	# write(outfile, getValue(spanish_slack))
-	# write(outfile, getValue(french_slack))
-	# write(outfile, getValue(logistics_slack))
-	# write(outfile, getValue(medofficer_slack))
-	# write(outfile, getValue(pha_slack))
-	# write(outfile, getValue(ICSpart_slack))
-	# write(outfile, getValue(ICSlead_slack))
-	# write(outfile, getValue(Response_primary_slack))
-	# write(outfile, getValue(Response_leader_slack))
-	# close(outfile)
 	println("=======================================")
 	println(getValue(month_assgn))
 	println("=======================================")
