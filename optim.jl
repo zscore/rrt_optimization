@@ -8,19 +8,7 @@ month_names = vec([string('m', year, '_', month) for year=2016:2017,month=1:12])
 month_pref = rrt[month_names]
 month_pref = rrt[vec([string('m', year, '_', month) for year=2016:2017,month=1:12])]
 
-# for i = 1:12
-# 	rename!(rrt, "m2016_$i", i)
-# end
-
-# for i = 1:12
-# 	rename!(rrt, "m2017_$i", i + 12)
-# end
-
-# rename!(rrt.colindex, [(symbol("m2016_$i")=>symbol("$i")) for i in 1:12])
-# rename!(rrt, "m2016_1", "1")
-
-priority_dict = ["preference" => 1.0,
-				 "spanish" => 1.0,
+priority_dict = ["spanish" => 1.0,
 				 "french" => 1.0,
 				 "logistics" => 1.0,
 				 "medofficer" => 1.0,
@@ -48,6 +36,7 @@ m = Model()
 # @defExpr(m, tot_spanish[month=1:tot_month],
 # 	sum{month_assgn[employ, month] * rrt[employ, "spanish"], employ=1:tot_employ})
 # Employees serve according to preference
+# We could make this a soft constraint, but that seems evil.
 @addConstraint(m, no_pref_confl[employ=1:tot_employ,month=1:tot_month],
 			   month_assgn[employ, month] + month_pref[employ, month] <= 1)
 # Each group contains 40 people
@@ -99,3 +88,33 @@ setObjective(m, :Min,
 			)
 
 status = solve(m)
+
+if status == :Optimal
+	# outfile = open("dat/optimization_output.txt", "w+")
+	# write(outfile, "=======================================")
+	# write(outfile, getValue(month_assgn))
+	# write(outfile, "=======================================")
+	# write(outfile, getValue(spanish_slack))
+	# write(outfile, getValue(french_slack))
+	# write(outfile, getValue(logistics_slack))
+	# write(outfile, getValue(medofficer_slack))
+	# write(outfile, getValue(pha_slack))
+	# write(outfile, getValue(ICSpart_slack))
+	# write(outfile, getValue(ICSlead_slack))
+	# write(outfile, getValue(Response_primary_slack))
+	# write(outfile, getValue(Response_leader_slack))
+	# close(outfile)
+	println("=======================================")
+	println(getValue(month_assgn))
+	println("=======================================")
+	println(getValue(spanish_slack))
+	println(getValue(french_slack))
+	println(getValue(logistics_slack))
+	println(getValue(medofficer_slack))
+	println(getValue(pha_slack))
+	println(getValue(ICSpart_slack))
+	println(getValue(ICSlead_slack))
+	println(getValue(Response_primary_slack))
+	println(getValue(Response_leader_slack))
+end
+
